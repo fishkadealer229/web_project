@@ -16,6 +16,7 @@ new_value = True
 flag = False
 flag1 = True
 flag2 = False
+photo_flag = False
 password = ''
 update_value = ''
 count_values = 1
@@ -160,6 +161,7 @@ async def ok(call: types.CallbackQuery):
 @dp.message_handler(content_types=['text'])
 async def db_insert(message: types.Message):
     global db_values, register_flag, search_flag, update_flag, flag1, flag2, new_value, update_value
+    not_data = False
     if register_flag:
         await message.reply('Эу нормально общайся. ОК?')
     elif search_flag:
@@ -169,7 +171,9 @@ async def db_insert(message: types.Message):
                 await message.answer(f'Вот его юзернейм: {username}')
                 break
             else:
-                await message.answer('К сожалению, по эти данным ничего не найдено:(')
+                not_data = True
+        if not_data:
+            await message.answer('К сожалению, по эти данным ничего не найдено:(')
     elif update_flag:
         new_value = True
         if new_value and message.text in blank_values:
@@ -203,18 +207,18 @@ async def db_insert(message: types.Message):
             db_values.append(int(message.text))
         else:
             db_values.append(message.text)
-    if flag2:
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(types.InlineKeyboardButton(text='Да', callback_data='end_register'))
-        keyboard.add(types.InlineKeyboardButton(text='Нет', callback_data='update_blank'))
-        await message.answer('Отлично', reply_markup=types.ReplyKeyboardRemove())
-        await message.answer('Закончим регистрацию?', reply_markup=keyboard)
-    elif not update_flag or (not flag1 and not new_value and flag2 and not search_flag):
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(types.InlineKeyboardButton(text='Да', callback_data='next'))
-        keyboard.add(types.InlineKeyboardButton(text='Конечно', callback_data='next'))
-        await message.answer('Отлично', reply_markup=types.ReplyKeyboardRemove())
-        await message.answer('Продолжаем?', reply_markup=keyboard)
+        if not photo_flag:
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.add(types.InlineKeyboardButton(text='Да', callback_data='next'))
+            keyboard.add(types.InlineKeyboardButton(text='Конечно', callback_data='next'))
+            await message.answer('Отлично', reply_markup=types.ReplyKeyboardRemove())
+            await message.answer('Продолжаем?', reply_markup=keyboard)
+        else:
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.add(types.InlineKeyboardButton(text='Да', callback_data='end_register'))
+            keyboard.add(types.InlineKeyboardButton(text='Нет', callback_data='update_blank'))
+            await message.answer('Отлично', reply_markup=types.ReplyKeyboardRemove())
+            await message.answer('Закончим регистрацию?', reply_markup=keyboard)
 
 
 @dp.callback_query_handler(text='next')
@@ -241,7 +245,7 @@ async def next_data(call: types.CallbackQuery):
 
 @dp.message_handler(content_types=['photo'])
 async def handle_docs_photo(message: types.Message):
-    global update_flag, last_username
+    global update_flag, last_username, photo_flag
     await message.answer(await message.photo[-1].download(f'\\photos\\{message.chat.id}.jpg'))
     await message.answer('Ваше фото успешно сохранено.')
     keyboard = types.InlineKeyboardMarkup()
