@@ -10,7 +10,7 @@ from UserLogin import UserLogin
 DATABASE = '/templates/meetings_data.db'
 DEBUG = True
 SECRET_KEY = 'Albert123'
-
+print(__name__)
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(DATABASE=os.path.join(app.root_path, 'meetings_data.db')))
@@ -108,5 +108,6 @@ def profile():
                 <p>user info: {current_user.get_id()}"""
 
 
-if __name__ == "__site__":
-    app.run(debug=True)
+if __name__ == "__flask__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
