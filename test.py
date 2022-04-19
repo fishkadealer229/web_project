@@ -13,7 +13,5 @@ cur = con.cursor()
 async def start(message: types.Message):
     await message.answer('hi')
 
-
-
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=False)
